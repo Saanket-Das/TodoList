@@ -80,3 +80,35 @@
         <ul id="taskList"></ul>
     </div>
     <script>
+       function addTask() {
+            let taskInput = document.getElementById("taskInput").value;
+            let reminderTime = document.getElementById("reminderTime").value;
+            if (taskInput === "") {
+                alert("Please enter a task");
+                return;
+            }
+            let taskList = document.getElementById("taskList");
+            let listItem = document.createElement("li");
+            listItem.innerHTML = `
+                <span onclick='toggleComplete(this)'>${taskInput}</span>
+                <button class='delete-btn' onclick='removeTask(this)'>Delete</button>`;
+            taskList.appendChild(listItem);
+            if (reminderTime) {
+                let reminderDate = new Date(reminderTime).getTime();
+                let now = new Date().getTime();
+                let timeDiff = reminderDate - now;
+                if (timeDiff > 0) {
+                    setTimeout(() => {
+                        alert(`Reminder: ${taskInput}`);
+                    }, timeDiff);
+                }
+            }
+            document.getElementById("taskInput").value = "";
+            document.getElementById("reminderTime").value = "";
+        }
+        function removeTask(button) {
+            button.parentElement.remove();
+        }
+        function toggleComplete(task) {
+            task.classList.toggle("completed");
+        }
