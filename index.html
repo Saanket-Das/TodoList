@@ -24,10 +24,12 @@
         }
         .input-section {
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         input, button {
             padding: 10px;
-            margin: 5px;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
@@ -74,7 +76,8 @@
         <h1>To-Do List</h1>
         <div class="input-section">
             <input type="text" id="taskInput" placeholder="Add a new task...">
-            <input type="datetime-local" id="reminderTime">
+            <input type="date" id="taskDate">
+            <input type="time" id="taskTime">
             <button onclick="addTask()">Add Task</button>
         </div>
         <ul id="taskList"></ul>
@@ -82,35 +85,45 @@
     <script>
        function addTask() {
             let taskInput = document.getElementById("taskInput").value;
-            let reminderTime = document.getElementById("reminderTime").value;
+            let taskDateInput = document.getElementById("taskDate").value;
+            let taskTimeInput = document.getElementById("taskTime").value;
             if (taskInput === "") {
                 alert("Please enter a task");
                 return;
             }
             let taskList = document.getElementById("taskList");
             let listItem = document.createElement("li");
+            let taskDate = taskDateInput ? formatDate(taskDateInput) : "No date";
+            let taskTime = taskTimeInput ? formatTime(taskTimeInput) : "No time";
             listItem.innerHTML = `
-                <span onclick='toggleComplete(this)'>${taskInput}</span>
+                <input type='checkbox' onclick='toggleComplete(this)'>
+                <span>${taskInput} - <small>${taskDate}, ${taskTime}</small></span>
                 <button class='delete-btn' onclick='removeTask(this)'>Delete</button>`;
             taskList.appendChild(listItem);
-            if (reminderTime) {
-                let reminderDate = new Date(reminderTime).getTime();
-                let now = new Date().getTime();
-                let timeDiff = reminderDate - now;
-                if (timeDiff > 0) {
-                    setTimeout(() => {
-                        alert(`Reminder: ${taskInput}`);
-                    }, timeDiff);
-                }
-            }
             document.getElementById("taskInput").value = "";
-            document.getElementById("reminderTime").value = "";
+            document.getElementById("taskDate").value = "";
+            document.getElementById("taskTime").value = "";
         }
         function removeTask(button) {
             button.parentElement.remove();
         }
-        function toggleComplete(task) {
-            task.classList.toggle("completed");
+        function toggleComplete(checkbox) {
+            let taskText = checkbox.nextElementSibling;
+            taskText.classList.toggle("completed", checkbox.checked);
+        }
+        function formatDate(dateString) {
+            let date = new Date(dateString);
+            let day = date.getDate();
+            let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let month = monthNames[date.getMonth()];
+            let suffix = (day % 10 === 1 && day !== 11) ? 'st' : (day % 10 === 2 && day !== 12) ? 'nd' : (day % 10 === 3 && day !== 13) ? 'rd' : 'th';
+            return `${day}${suffix} ${month}`;
+        }
+        function formatTime(timeString) {
+            let [hours, minutes] = timeString.split(":");
+            let period = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
+            return `${hours}:${minutes} ${period}`;
         }
     </script>
 </body>
